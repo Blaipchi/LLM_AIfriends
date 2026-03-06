@@ -22,8 +22,8 @@ import SearchIcon from "@/components/navbar/icons/SearchIcon.vue";
         </div>
         <!--   中间部分     -->
         <!--    搜索框    -->
-        <div class="navbar-center w-4/5 max-w-180">
-          <div class="join w-4/5">
+        <div class="navbar-center w-4/5 max-w-180 flex justify-center">
+          <div class="join w-4/5 flex justify-center">
             <input class="input join-item rounded-l-full w-full" placeholder="搜索你感兴趣的内容" />
             <button class="btn join-item rounded-r-full gap-1 pl-3 pr-5">
               <SearchIcon />搜索
