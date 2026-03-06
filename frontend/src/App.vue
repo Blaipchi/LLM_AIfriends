@@ -5,7 +5,7 @@ import NavBar from "@/components/navbar/NavBar.vue";
 
 <template>
   <NavBar>
-    一切的开始！！！
+    <RouterView  />
   </NavBar>
 </template>
 

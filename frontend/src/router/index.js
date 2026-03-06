@@ -52,6 +52,7 @@ const router = createRouter({
           name: 'user-profile-index'
       },
       {
+          // 没有找到页面就会匹配到404页面
           path: '/:pathMatch(.*)*',
           component: NotFoundIndex,
           name: 'not-found'
