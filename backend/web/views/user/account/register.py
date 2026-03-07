@@ -26,6 +26,7 @@ class RegisterView(APIView):
             refresh = RefreshToken.for_user(user)
             response = Response({
                 'result': 'success',
+                'access': str(refresh.access_token),
                 'user_id': user.id,
                 'username': user.username,
                 'photo': user_profile.photo.url,  # 必须要加url，否者不会返回路径
