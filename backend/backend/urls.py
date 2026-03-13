@@ -19,11 +19,11 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('web.urls')),
 ]
+
 
 # 仅限开发阶段使用。生产阶段需要在nginx里配置。
 if settings.DEBUG:

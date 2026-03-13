@@ -1,49 +1,43 @@
 <script setup>
-import {nextTick,  onBeforeUnmount, ref, useTemplateRef, watch} from "vue";
+import {nextTick, onBeforeUnmount, ref, useTemplateRef, watch} from "vue";
 import CameraIcon from "@/views/user/profile/components/icon/CameraIcon.vue";
 import Croppie from 'croppie'
 import 'croppie/croppie.css'
 
-// 接收来自父组件的参数，这里的photo 要与 Profile.vue 中定义的 photo 一致
 const props = defineProps(['photo'])
-// myphoto是会变的，所以这里定义的是响应式变量
 const myPhoto = ref(props.photo)
 
-// 响应式变化
 watch(() => props.photo, newVal => {
   myPhoto.value = newVal
 })
 
-const fileInputRef =useTemplateRef('file-input-ref')
+const fileInputRef = useTemplateRef('file-input-ref')
 const modalRef = useTemplateRef('modal-ref')
 const croppieRef = useTemplateRef('croppie-ref')
 let croppie = null
 
-// 能够打开modal框
-async function openModal(photo){
-  // 打开modal框
+async function openModal(photo) {
   modalRef.value.showModal()
   await nextTick()
 
-  if(!croppie){
-    // 创建croppie对象
-    croppie = new Croppie(croppieRef.value,{
+  if (!croppie) {
+    croppie = new Croppie(croppieRef.value, {
       viewport: {width: 200, height: 200, type: 'square'},
       boundary: {width: 300, height: 300},
       enableOrientation: true,
       enforceBoundary: true,
     })
   }
+
   croppie.bind({
     url: photo,
   })
 }
 
-// 选定图片后点击确定后的裁剪函数
-async function crop(){
-  if(!croppie) return
+async function crop() {
+  if (!croppie) return
 
-  myPhoto.value = await croppie.result({  // 获取裁剪结果
+  myPhoto.value = await croppie.result({
     type: 'base64',
     size: 'viewport',
   })
@@ -51,28 +45,25 @@ async function crop(){
   modalRef.value.close()
 }
 
-function onFileChange(e){
-  const file =e.target.files[0]
+function onFileChange(e) {
+  const file = e.target.files[0]
   e.target.value = ''
-  if(!file) return
+  if (!file) return
 
   const reader = new FileReader()
   reader.onload = () => {
     openModal(reader.result)
   }
 
-  // 会把文件读成base64的形式
   reader.readAsDataURL(file)
 }
 
-// 释放croppie对象，防止内存泄漏
 onBeforeUnmount(() => {
   croppie?.destroy()
 })
 
-
 defineExpose({
-  myPhoto
+  myPhoto,
 })
 </script>
 
@@ -80,7 +71,7 @@ defineExpose({
   <div class="flex justify-center">
     <div class="avatar relative">
       <div class="w-28 rounded-full">
-        <img :src="myPhoto" />
+        <img :src="myPhoto" alt="">
       </div>
       <div @click="fileInputRef.click()" class="absolute left-0 top-0 w-28 h-28 flex justify-center items-center bg-black/20 rounded-full cursor-pointer">
         <CameraIcon />

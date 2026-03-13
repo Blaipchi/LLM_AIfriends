@@ -13,14 +13,12 @@ class RegisterView(APIView):
             password = request.data['password'].strip()
             if not username or not password:
                 return Response({
-                    'result': '用户名或密码不能为空'
+                    'result': '用户名和密码不能为空'
                 })
-            # 用户名不能重复
             if User.objects.filter(username=username).exists():
                 return Response({
                     'result': '用户名已存在'
                 })
-            # 在User数据库里面创建一个user
             user = User.objects.create_user(username=username, password=password)
             user_profile = UserProfile.objects.create(user=user)
             refresh = RefreshToken.for_user(user)
@@ -29,15 +27,16 @@ class RegisterView(APIView):
                 'access': str(refresh.access_token),
                 'user_id': user.id,
                 'username': user.username,
-                'photo': user_profile.photo.url,  # 必须要加url，否者不会返回路径
+                'photo': user_profile.photo.url,  # 必须加url！！！
                 'profile': user_profile.profile,
             })
             response.set_cookie(
-                key='refresh_token',  # 设置cookie的key
+                key='refresh_token',
                 value=str(refresh),
-                httponly=True,  #
-                samesite='Lax',  # 设置httponly
-                max_age=864000 * 7,  # 7天
+                httponly=True,
+                samesite='Lax',
+                secure=True,
+                max_age=86400 * 7,
             )
             return response
         except:

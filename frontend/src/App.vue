@@ -1,28 +1,26 @@
 <script setup>
-
 import NavBar from "@/components/navbar/NavBar.vue";
 import {onMounted} from "vue";
 import {useUserStore} from "@/stores/user.js";
-import {useRoute, useRouter} from "vue-router";
 import api from "@/js/http/api.js";
+import {useRoute, useRouter} from "vue-router";
 
 const user = useUserStore()
 const route = useRoute()
 const router = useRouter()
 
 onMounted(async () => {
-  try{
+  try {
     const res = await api.get('/api/user/account/get_user_info/')
     const data = res.data
-    if (data.result === 'success'){
+    if (data.result === 'success') {
       user.setUserInfo(data)
     }
-  }catch(err){
-      console.log(err)
-  }finally {
+  } catch (err) {
+  } finally {
     user.setHasPulledUserInfo(true)
 
-    if (route.meta.needLogin && !user.isLogin()){
+    if (route.meta.needLogin && !user.isLogin()) {
       await router.replace({
         name: 'user-account-login-index',
       })
@@ -33,7 +31,7 @@ onMounted(async () => {
 
 <template>
   <NavBar>
-    <RouterView  />
+    <RouterView />
   </NavBar>
 </template>
 

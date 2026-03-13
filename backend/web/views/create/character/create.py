@@ -1,4 +1,3 @@
-from django.utils.termcolors import background
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -20,19 +19,19 @@ class CreateCharacterView(APIView):
 
             if not name:
                 return Response({
-                    'result': '名字不能为空',
+                    'result': '名字不能为空'
                 })
             if not profile:
                 return Response({
-                    'result': '角色介绍不能为空',
+                    'result': '角色介绍不能为空'
                 })
             if not photo:
                 return Response({
-                    'result': '角色头像不能为空',
+                    'result': '头像不能为空'
                 })
             if not background_image:
                 return Response({
-                    'result': '聊天背景图不能为空',
+                    'result': '聊天背景不能为空'
                 })
 
             Character.objects.create(
@@ -40,12 +39,12 @@ class CreateCharacterView(APIView):
                 name=name,
                 profile=profile,
                 photo=photo,
-                background_image=background_image
+                background_image=background_image,
             )
             return Response({
                 'result': 'success',
             })
         except:
             return Response({
-                'result': '系统异常，请稍后尝试',
+                'result': '系统异常，请稍后重试'
             })

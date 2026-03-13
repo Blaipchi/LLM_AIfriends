@@ -1,6 +1,6 @@
 from django.utils.timezone import now
-from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
 from web.models.character import Character
@@ -9,7 +9,6 @@ from web.views.utils.photo import remove_old_photo
 
 class UpdateCharacterView(APIView):
     permission_classes = [IsAuthenticated]
-
     def post(self, request):
         try:
             character_id = request.data['character_id']
@@ -21,7 +20,7 @@ class UpdateCharacterView(APIView):
 
             if not name:
                 return Response({
-                    'result': '名字不能为空'
+                    'result': "名字不能为空"
                 })
             if not profile:
                 return Response({
@@ -31,16 +30,16 @@ class UpdateCharacterView(APIView):
                 remove_old_photo(character.photo)
                 character.photo = photo
             if background_image:
-                remove_old_photo(character.background)
-                character.background = background_image
+                remove_old_photo(character.background_image)
+                character.background_image = background_image
             character.name = name
             character.profile = profile
-            character.update = now()
+            character.update_time = now()
             character.save()
             return Response({
-                'result': 'success'
+                'result': 'success',
             })
         except:
             return Response({
-                'result': '系统异常，请稍后尝试'
+                'result': '系统异常，请稍后重试'
             })

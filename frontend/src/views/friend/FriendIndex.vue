@@ -3,7 +3,7 @@
 </script>
 
 <template>
-好友界面
+好友
 </template>
 
 <style scoped>
