@@ -14,9 +14,17 @@
 - [backend/web/views/create/character/update.py](file://backend/web/views/create/character/update.py)
 - [backend/web/views/create/character/remove.py](file://backend/web/views/create/character/remove.py)
 - [backend/web/views/create/character/get_single.py](file://backend/web/views/create/character/get_single.py)
+- [backend/web/views/create/character/get_list.py](file://backend/web/views/create/character/get_list.py)
 - [backend/web/models/user.py](file://backend/web/models/user.py)
 - [backend/web/models/character.py](file://backend/web/models/character.py)
 </cite>
+
+## 更新摘要
+**所做更改**
+- 新增角色列表查询接口的完整文档说明
+- 添加了 `GET /api/create/character/get_list/` 接口的详细说明
+- 包含请求参数、响应格式、错误处理等完整文档
+- 更新了角色管理接口章节，添加了列表查询功能
 
 ## 目录
 1. [简介](#简介)
@@ -41,7 +49,7 @@ graph TB
 RootURLs["根路由<br/>backend/backend/urls.py"] --> WebURLs["应用路由<br/>backend/web/urls.py"]
 WebURLs --> UserAccount["用户账户接口组<br/>登录/注册/登出/刷新/获取信息"]
 WebURLs --> UserProfile["用户资料接口组<br/>更新资料/头像"]
-WebURLs --> CharacterOps["角色接口组<br/>创建/更新/删除/查询单个"]
+WebURLs --> CharacterOps["角色接口组<br/>创建/更新/删除/查询单个/查询列表"]
 ```
 
 图表来源
@@ -420,11 +428,58 @@ V-->>C : "返回访问令牌(可更新Cookie)"
 章节来源
 - [backend/web/views/create/character/get_single.py:8-28](file://backend/web/views/create/character/get_single.py#L8-L28)
 
+#### 查询角色列表
+- 方法与路径
+  - GET /api/create/character/get_list/
+- 权限要求
+  - 需已登录（IsAuthenticated）
+- 查询参数
+  - item_count: number, 必填（分页偏移量，每次获取20条）
+  - user_id: number, 必填（目标用户的ID）
+- 成功响应字段
+  - result: string, 固定值 "success"
+  - user_profile: object
+    - user_id: number
+    - username: string
+    - profile: string
+    - photo: string, 头像URL
+  - characters: array
+    - id: number
+    - name: string
+    - profile: string
+    - photo: string, 头像URL
+    - background_image: string, 背景图URL
+    - author: object
+      - id: number
+      - username: string
+      - photo: string, 头像URL
+- 失败响应字段
+  - result: string, 错误原因
+- 状态码
+  - 200: 成功
+  - 400: 参数缺失或越权访问
+  - 401: 未登录
+  - 500: 系统异常
+- 行为
+  - 支持分页查询，每次返回最多20条角色记录
+  - 按创建时间倒序排列
+  - 仅返回指定用户的角色
+- 示例
+  - 请求: GET /api/create/character/get_list/?item_count=0&user_id=1
+  - 响应: { "result": "success", "user_profile": { "user_id": 1, "username": "...", "profile": "...", "photo": "/media/..." }, "characters": [ { "id": 1, "name": "...", "profile": "...", "photo": "/media/...", "background_image": "/media/...", "author": { "id": 1, "username": "...", "photo": "/media/..." } } ] }
+- 常见问题
+  - 缺少必填参数返回参数缺失提示
+  - 非本人用户ID返回越权提示
+  - 服务器内部异常返回系统异常提示
+
+章节来源
+- [backend/web/views/create/character/get_list.py:9-47](file://backend/web/views/create/character/get_list.py#L9-L47)
+
 ## 依赖分析
 - 组件耦合
   - 所有受保护接口均依赖 IsAuthenticated 权限类，确保仅登录用户可访问。
   - 登录/注册接口依赖 UserProfile 模型以初始化用户资料。
-  - 角色接口依赖 Character 模型与 UserProfile 关联，实现“作者”约束。
+  - 角色接口依赖 Character 模型与 UserProfile 关联，实现"作者"约束。
 - 外部依赖
   - djangorestframework_simplejwt：用于生成与验证 JWT。
   - Django 文件上传：ImageField 与 MEDIA_ROOT 配置共同决定文件存储与访问。
@@ -442,6 +497,7 @@ CharCreate["创建角色视图"] --> Character["角色模型"]
 CharUpdate["更新角色视图"] --> Character
 CharRemove["删除角色视图"] --> Character
 CharGet["查询角色视图"] --> Character
+CharList["查询角色列表视图"] --> Character
 Character --> UserProfile
 ```
 
@@ -455,6 +511,7 @@ Character --> UserProfile
 - [backend/web/views/create/character/update.py:10-46](file://backend/web/views/create/character/update.py#L10-L46)
 - [backend/web/views/create/character/remove.py:9-25](file://backend/web/views/create/character/remove.py#L9-L25)
 - [backend/web/views/create/character/get_single.py:8-28](file://backend/web/views/create/character/get_single.py#L8-L28)
+- [backend/web/views/create/character/get_list.py:9-47](file://backend/web/views/create/character/get_list.py#L9-L47)
 - [backend/web/models/user.py:14-23](file://backend/web/models/user.py#L14-L23)
 - [backend/web/models/character.py:21-32](file://backend/web/models/character.py#L21-L32)
 
@@ -471,6 +528,7 @@ Character --> UserProfile
   - 若开启刷新令牌轮换，可降低长期暴露风险。
 - 数据库访问
   - 查询单个角色时使用外键过滤，避免跨用户数据泄露。
+  - 角色列表查询使用分页机制，每次最多返回20条记录，提高响应速度。
   - 批量操作建议后端增加分页与并发控制。
 
 ## 故障排除指南
@@ -484,6 +542,9 @@ Character --> UserProfile
   - 生产环境需确保 HTTPS 与正确 SameSite 配置，避免浏览器拦截。
 - 文件上传失败
   - 检查文件类型与大小限制，确认 MEDIA_ROOT 可写且路径可达。
+- 角色列表查询问题
+  - 确保 item_count 和 user_id 参数为有效数字
+  - 检查 user_id 是否对应已登录用户
 
 章节来源
 - [backend/web/views/user/account/login.py:14-17](file://backend/web/views/user/account/login.py#L14-L17)
@@ -492,9 +553,10 @@ Character --> UserProfile
 - [backend/web/views/create/character/create.py:20-35](file://backend/web/views/create/character/create.py#L20-L35)
 - [backend/web/views/user/account/refresh_token.py:10-14](file://backend/web/views/user/account/refresh_token.py#L10-L14)
 - [backend/web/views/user/account/refresh_token.py:35-38](file://backend/web/views/user/account/refresh_token.py#L35-L38)
+- [backend/web/views/create/character/get_list.py:12-18](file://backend/web/views/create/character/get_list.py#L12-L18)
 
 ## 结论
-本 API 文档覆盖了用户认证、个人资料与文件上传、角色管理等核心能力。通过 JWT 与 Cookie 的组合实现安全的会话管理，配合严格的权限控制与输入校验，确保接口稳定可靠。建议在生产环境中完善日志审计、速率限制与文件安全扫描，持续提升安全性与用户体验。
+本 API 文档覆盖了用户认证、个人资料与文件上传、角色管理等核心能力。通过 JWT 与 Cookie 的组合实现安全的会话管理，配合严格的权限控制与输入校验，确保接口稳定可靠。新增的角色列表查询接口提供了分页查询能力，支持大量角色数据的高效访问。建议在生产环境中完善日志审计、速率限制与文件安全扫描，持续提升安全性与用户体验。
 
 ## 附录
 

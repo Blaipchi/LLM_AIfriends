@@ -16,6 +16,12 @@
 - [RegisterIndex.vue](file://frontend/src/views/user/account/RegisterIndex.vue)
 </cite>
 
+## 更新摘要
+**所做更改**
+- 增强了登录认证功能的调试能力，在异常处理中添加traceback模块
+- 提供更详细的错误堆栈信息以便故障排查
+- 更新了异常处理机制的说明和故障排除指南
+
 ## 目录
 1. [简介](#简介)
 2. [项目结构](#项目结构)
@@ -30,6 +36,8 @@
 ## 简介
 
 本文件为用户认证模块的完整API文档，涵盖用户登录、注册、登出、Token刷新和获取用户信息等核心功能。该系统基于Django框架和Django REST Framework构建，采用JWT（JSON Web Token）进行身份认证，并通过Cookie存储刷新Token。系统支持CORS跨域访问，具备完善的错误处理机制和安全考虑。
+
+**更新** 增强了异常处理和调试能力，为开发和运维人员提供更好的故障排查支持。
 
 ## 项目结构
 
@@ -78,7 +86,7 @@ end
 用户认证模块由以下核心组件构成：
 
 ### 后端视图组件
-- **LoginView**: 处理用户登录请求，验证凭据并生成JWT令牌
+- **LoginView**: 处理用户登录请求，验证凭据并生成JWT令牌，包含增强的异常处理和调试功能
 - **RegisterView**: 处理用户注册请求，创建新用户账户
 - **LogoutView**: 处理用户登出请求，清除认证状态
 - **RefreshTokenView**: 处理JWT刷新请求，使用Cookie中的刷新令牌
@@ -90,7 +98,7 @@ end
 - **登录/注册界面**: Vue组件实现用户交互
 
 **章节来源**
-- [login.py:9-46](file://backend/web/views/user/account/login.py#L9-L46)
+- [login.py:9-48](file://backend/web/views/user/account/login.py#L9-L48)
 - [register.py:9-45](file://backend/web/views/user/account/register.py#L9-L45)
 - [logout.py:6-14](file://backend/web/views/user/account/logout.py#L6-L14)
 - [refresh_token.py:7-39](file://backend/web/views/user/account/refresh_token.py#L7-L39)
@@ -178,10 +186,15 @@ Backend-->>Frontend : 成功响应
 #### 错误处理
 - 用户名或密码为空：返回400状态码
 - 用户名或密码错误：返回400状态码
-- 系统异常：返回500状态码
+- 系统异常：返回500状态码，包含详细的错误堆栈信息
+
+**增强功能** 登录接口现在包含增强的异常处理机制：
+- 使用 `import traceback` 模块捕获和记录详细的错误堆栈
+- 在服务器日志中输出完整的异常信息，便于快速定位问题
+- 提供更友好的错误消息："系统异常，请稍后重试"
 
 **章节来源**
-- [login.py:10-46](file://backend/web/views/user/account/login.py#L10-L46)
+- [login.py:10-48](file://backend/web/views/user/account/login.py#L10-L48)
 
 ### 注册接口 (POST /api/user/account/register/)
 
@@ -420,6 +433,11 @@ B --> G
 - **用户资料**: 每次登录和获取信息时只进行一次数据库查询
 - **索引设计**: 用户名字段使用唯一索引避免重复注册
 
+### 异常处理优化
+- **增强调试**: 登录接口现在包含traceback模块，提供详细的错误堆栈信息
+- **快速故障排查**: 开发者可以通过服务器日志快速定位问题
+- **用户友好**: 保持对用户的友好错误消息，同时提供详细的后台日志
+
 ## 故障排除指南
 
 ### 常见问题及解决方案
@@ -454,9 +472,24 @@ B --> G
 - 提示用户选择其他用户名
 - 实时检查用户名可用性
 
+#### 5. 系统异常问题
+**症状**: "系统异常，请稍后重试" 错误消息
+**原因**: 服务器内部错误
+**解决方案**:
+- 查看服务器日志中的traceback堆栈信息
+- 检查数据库连接和权限
+- 验证JWT配置和密钥设置
+
+**增强功能** 针对系统异常问题的专门处理：
+- 登录接口现在包含 `import traceback` 语句
+- 服务器会在日志中输出完整的异常堆栈跟踪
+- 开发者可以快速定位具体的错误位置和原因
+- 支持多层异常捕获和详细错误报告
+
 **章节来源**
 - [settings.py:153-159](file://backend/backend/settings.py#L153-L159)
 - [api.js:46-90](file://frontend/src/js/http/api.js#L46-L90)
+- [login.py:42-47](file://backend/web/views/user/account/login.py#L42-L47)
 
 ## 结论
 
@@ -478,4 +511,9 @@ B --> G
 - 完善的CORS配置
 - 前后端职责清晰分离
 
-该认证系统为后续的功能扩展奠定了良好的基础，建议在生产环境中进一步完善安全配置和监控机制。
+### 开发支持增强
+- **增强的调试能力**: 登录接口现在包含traceback模块，提供详细的错误堆栈信息
+- **快速故障排查**: 开发者可以通过服务器日志快速定位和解决问题
+- **用户友好**: 保持对用户的友好错误消息，同时提供详细的后台日志支持
+
+该认证系统为后续的功能扩展奠定了良好的基础，建议在生产环境中进一步完善安全配置和监控机制。增强的异常处理功能将显著提升系统的可维护性和开发效率。
