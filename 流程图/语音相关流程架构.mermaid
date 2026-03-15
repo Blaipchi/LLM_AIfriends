@@ -1,0 +1,10 @@
+graph TB
+    A[HTTP 请求] --> B[同步：准备数据]
+    B --> C[创建线程]
+    C --> D[异步事件循环]
+    D --> E[tts_sender: AI 文本生成]
+    D --> F[tts_receiver: 音频合成]
+    E --> G[消息队列 mq]
+    F --> G
+    G --> H[主线程读取队列]
+    H --> I[SSE 流式推送给前端]

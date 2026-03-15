@@ -1,0 +1,8 @@
+backend/web/views/friend/message/
+├── memory/
+│   ├── graph.py      # 记忆处理 Agent（LangGraph 状态图）
+│   └── update.py     # 记忆更新逻辑（组装输入、调用 Agent、保存结果）
+├── chat/
+│   ├── chat.py       # 聊天功能（使用记忆、触发记忆更新）
+│   └── graph.py      # 聊天 Agent（RAG + 工具调用）
+└── get_history.py    # 获取历史消息

@@ -1,0 +1,14 @@
+graph TB
+    Start[START] --> Agent[agent 节点<br/>LLM 思考]
+    Agent --> Condition{条件判断<br/>should_continue}
+    
+    Condition -->|有 tool_calls| Tools[tools 节点<br/>执行工具]
+    Condition -->|无 tool_calls| End[END<br/>结束]
+    
+    Tools --> Agent
+    
+    style Start fill:#81c784
+    style End fill:#e57373
+    style Agent fill:#64b5f6
+    style Tools fill:#ffb74d
+    style Condition fill:#ba68c8

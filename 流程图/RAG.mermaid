@@ -1,0 +1,11 @@
+graph LR
+    A[用户提问] --> B[ChatGraph Agent]
+    B --> C{是否需要<br/>查询知识库？}
+    C -->|是 | D[search_knowledge_base 工具]
+    D --> E[LanceDB 向量检索]
+    E --> F[CustomEmbeddings<br/>查询向量化]
+    F --> G[返回 Top 3 相似文档]
+    G --> H[LLM 结合上下文生成回答]
+    C -->|否 | I[直接 LLM 回答]
+    H --> J[返回给用户]
+    I --> J

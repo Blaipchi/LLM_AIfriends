@@ -1,0 +1,11 @@
+graph LR
+    A[用户创建角色] --> B[填写角色介绍<br/>character.profile]
+    B --> C[保存到数据库]
+    C --> D[用户与角色聊天]
+    D --> E[add_system_prompt 函数]
+    E --> F[从数据库读取<br/>SystemPrompt 提示词]
+    F --> G[拼接角色性格<br/>friend.character.profile]
+    G --> H[拼接长期记忆]
+    H --> I[组成 SystemMessage]
+    I --> J[发送给 LLM]
+    J --> K[AI 按角色性格回复]

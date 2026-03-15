@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant U as 用户
+    participant A as Agent 节点
+    participant C as 条件判断
+    participant T as Tools 节点
+    participant RAG as RAG 检索
+    participant LLM as LLM 模型
+    
+    U->>A: "阿里云百炼平台是什么？"
+    A->>LLM: invoke(messages)
+    LLM-->>A: AIMessage(tool_calls=[search_knowledge_base])
+    A->>C: should_continue(state)
+    C-->>A: 返回 "tools"
+    A->>T: 执行 search_knowledge_base("阿里云百炼平台")
+    T->>RAG: LanceDB 相似度搜索
+    RAG-->>T: 返回 3 个相关文档片段
+    T-->>T: 格式化检索结果
+    T->>A: 工具结果加入 messages
+    A->>LLM: invoke(messages + 检索结果)
+    LLM-->>A: AIMessage(结合 RAG 的回答)
+    A->>C: should_continue(state)
+    C-->>A: 返回 "end"
+    A-->>U: 输出最终回复

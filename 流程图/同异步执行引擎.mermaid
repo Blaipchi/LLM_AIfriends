@@ -1,0 +1,17 @@
+graph TB
+    User[用户请求] --> Router{路由分发}
+    
+    Router -->|登录/注册/查询 | Sync[同步处理]
+    Sync --> DB[(数据库)]
+    DB --> SyncResponse[同步响应]
+    
+    Router -->|AI 聊天/语音 | Async[异步处理]
+    Async --> Thread[后台线程]
+    Thread --> EventLoop[asyncio 事件循环]
+    EventLoop --> LLM[大模型 API]
+    EventLoop --> TTS[TTS WebSocket]
+    EventLoop --> ASR[ASR WebSocket]
+    LLM --> MQ[消息队列]
+    TTS --> MQ
+    MQ --> SSE[SSE 流式推送]
+    SSE --> Frontend[前端实时显示]
